@@ -8,3 +8,8 @@ for my daily routines (I have attached url information where I found it from).
 
 
 ***You can look at the codes unless you won't lose your eyes***
+
+
+* This repository includes some groups, it makes easier to find scripts in my garbage:
+
+    `*` MyPythonLibraries: Some most used codes in my repos have been recreated as a library
