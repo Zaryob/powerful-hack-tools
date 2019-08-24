@@ -16,7 +16,7 @@ desc = 'A library to load and create po translation files.'
 
 if __name__ == '__main__':
     setup(name="poimport",
-          version=1.0,
+          version=1.01,
           description='A library to load and create po translation files.',
           long_description='A library to load and create po translation files.',
           license="GNU AGPLv3",
