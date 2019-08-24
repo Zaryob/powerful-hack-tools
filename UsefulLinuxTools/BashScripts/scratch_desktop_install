@@ -1,0 +1,42 @@
+#!/bin/sh
+# Have been forked from https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/831f65cdee181e1f5159d782a12cadf04994fc7e/create-deb.sh
+# in my gist and it uploaded this repo for keep them on my pigeonhole
+######## install electron
+sudo apt-get install npm gdebi p7zip-full
+cd ~
+npm install electron@4.1.4 --save-dev
+
+
+######## extract scratch-desktop
+rm -rf /tmp/scratch-desktop
+mkdir /tmp/scratch-desktop
+wget -O /tmp/scratch-desktop.exe 'https://downloads.scratch.mit.edu/desktop/Scratch%20Desktop%20Setup%203.4.0.exe'
+7za x -aoa -y /tmp/scratch-desktop.exe -o/tmp/scratch-desktop
+
+
+######## create electron app
+cp -rf ~/node_modules/electron/dist/* /tmp/scratch-desktop/
+ln -fsr /tmp/scratch-desktop/electron /tmp/scratch-desktop/scratch-desktop
+
+
+######## fix permissions
+chmod 755 /tmp/scratch-desktop/locales
+chmod 755 /tmp/scratch-desktop/swiftshader
+chmod 755 /tmp/scratch-desktop/resources
+chmod 755 /tmp/scratch-desktop/resources/static
+chmod 755 /tmp/scratch-desktop/resources/static/assets
+
+
+######## get application icon
+wget -O /tmp/scratch-desktop/resources/Icon.png 'https://scratch.mit.edu/images/download/icon.png'
+
+
+######## create deb package
+cd ~
+npm install electron-installer-debian
+wget -O /tmp/config-deb.json 'https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/223cc112d99c3bdc1829fc25b19c260856134a82/config-deb.json'
+~/node_modules/.bin/electron-installer-debian --config /tmp/config-deb.json
+
+
+######## install deb file
+sudo gdebi /tmp/scratch-desktop_3.4.0_amd64.deb
