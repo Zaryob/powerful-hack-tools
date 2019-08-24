@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+
+import googletrans
+
+import poimport
+
+import sys
+
+def loadPoFile(filename=""):
+    if not filename:
+        raise ("Please give me a filename.")
+    else:
+        po = poimport.Po()
+        try:
+            po.load(filename=filename)
+        except Exception:
+            raise ("Unable to import po file: {}\n\nInvalid syntax.".format(filename))
+        return po
+
+def translateMessageForLanguage(message, to_language=None):
+    translator=googletrans.Translator()
+    if googletrans.LANGUAGES[to_language]:
+        print("Translating message string (msgid): {}".format(message))
+        translated = translator.translate(message, dest=to_language).text
+        print("Translated message string (msgid) : {}".format(translated))
+        return translated
+    else:
+        raise ("Unable to translate message for {} language".format(to_language))
+
+def generateMessages(filename="", to_language=""):
+    if not filename:
+        raise ("Please give me a filename.")
+    else:
+        print("Loading po file...")
+        po_file=loadPoFile(filename)
+        print("Generating Translations...")
+        new_messages = []
+        for msg in po_file.messages:
+            if not msg.msgstr:
+                msg.msgstr=translateMessageForLanguage(msg.msgid, to_language=to_language)
+
+                if "fuzzy" not in msg.flags:
+                    msg.flags.append("fuzzy") #Güven olmaz google translate'ye
+
+            new_messages.append(msg)
+
+        print("Saving translation as {}.new".format(filename))
+        po_file.messages=new_messages
+        po_file.save(filename+".new")
+
+if __name__ == '__main__':
+    usage = "po2goo-trans <filename> <which-language-will-be-translated>"
+    print(len(sys.argv))
+    if len(sys.argv)<2:
+        print(usage)
+        exit()
+
+    filename=sys.argv[1]
+
+    try:
+        to_language=sys.argv[2]
+    except:
+        to_language=filename.split("/")[-1].split(".")[0]
+        print("Language will be fallen back as {}".format(to_language))
+    finally:
+        generateMessages(filename=filename,to_language=to_language)
