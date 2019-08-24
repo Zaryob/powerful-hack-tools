@@ -1,11 +1,20 @@
 #!/bin/sh
 # Have been forked from https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/831f65cdee181e1f5159d782a12cadf04994fc7e/create-deb.sh
 # in my gist and it uploaded this repo for keep them on my pigeonhole
+
 ######## install electron
-sudo apt-get install npm gdebi p7zip-full
+
+if [ $"dpkg --help" ] && [ $"apt  --help" ]; then
+    sudo apt-get install npm gdebi p7zip-full
+elif [$"rpm --help"]; then
+    sudo dnf install npm p7zip
+else
+    echo "It is not compitable with your system"
+    exit 
+fi
+
 cd ~
 npm install electron@4.1.4 --save-dev
-
 
 ######## extract scratch-desktop
 rm -rf /tmp/scratch-desktop
@@ -31,12 +40,19 @@ chmod 755 /tmp/scratch-desktop/resources/static/assets
 wget -O /tmp/scratch-desktop/resources/Icon.png 'https://scratch.mit.edu/images/download/icon.png'
 
 
-######## create deb package
-cd ~
-npm install electron-installer-debian
-wget -O /tmp/config-deb.json 'https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/223cc112d99c3bdc1829fc25b19c260856134a82/config-deb.json'
-~/node_modules/.bin/electron-installer-debian --config /tmp/config-deb.json
-
-
-######## install deb file
-sudo gdebi /tmp/scratch-desktop_3.4.0_amd64.deb
+if [ $"dpkg --help" ] && [ $"apt  --help" ]; then
+        cd ~
+        npm install electron-installer-debian
+        wget -O /tmp/config-deb.json 'https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/223cc112d99c3bdc1829fc25b19c260856134a82/config-deb.json'
+        ~/node_modules/.bin/electron-installer-debian --config /tmp/config-deb.json
+        sudo gdebi /tmp/scratch-desktop_3.4.0_amd64.deb
+elif [$"rpm --help"]; then
+        sudo dnf install rpm-build
+        cd ~
+        npm install electron-installer-redhat
+        wget -O /tmp/config-rpm.json 'https://gist.githubusercontent.com/lyshie/0c49393076b8b375ca1bd98c28f95fb0/raw/223cc112d99c3bdc1829fc25b19c260856134a82/config-rpm.json'
+        ~/node_modules/.bin/electron-installer-redhat --config /tmp/config-rpm.json
+else
+    echo "Have I said it is not compitable with your system??"
+    exit 
+fi
