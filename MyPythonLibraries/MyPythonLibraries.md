@@ -6,4 +6,3 @@ It includes some libraries created to my unique :stuck_out_tongue_closed_eyes:  
 * This folder includes:
 
     - **PoImport**: It is very useful po file wrapper
-    - **OptimizeImage**: Optimizes Images with PIL.
